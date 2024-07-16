@@ -1,3 +1,6 @@
 [submodule "web3-signature/lib/forge-std"]
 	path = web3-signature/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "web3-signature/lib/openzeppelin-contracts"]
+	path = web3-signature/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
