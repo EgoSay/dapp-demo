@@ -1,0 +1,3 @@
+[submodule "web3-signature/lib/forge-std"]
+	path = web3-signature/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
