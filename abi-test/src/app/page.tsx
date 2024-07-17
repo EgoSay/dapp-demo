@@ -28,7 +28,7 @@ const client = createPublicClient({
 
 export default function Home() {
 
-  const [blockNumber, setBlockNumber] = useState<any>('100');
+  const [blockNumber, setBlockNumber] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
   const [transferLogs, setTransferLogs] = useState<any>();
   
@@ -56,13 +56,17 @@ export default function Home() {
 
   return (
     <div className ={style.container}>
-        <h1>查询 Ethereum USDC 转账记录</h1>
-        <input className={style.input}
+        <h1><strong>查询 Ethereum USDC 转账记录</strong></h1>
+        <div className={style.flexContainer}>
+        <label className={style.label}>输入查询区块数: </label> 
+        <input className={style.input} 
           type="text"
           value={blockNumber}
           onChange={(e) => setBlockNumber(e.target.value)}
           placeholder="Enter block number"
         />
+        </div>
+       
         <button className={style.button} onClick={fetchTransferLogs} disabled={loading}>
           {loading ? 'Loading...' : 'Fetch Transfer Logs'}
         </button> 
@@ -70,7 +74,7 @@ export default function Home() {
         <ul className={style.resultList}>
         {transferLogs && transferLogs.map((transfer:any, index:number) => (
           <li key={index} className={style.resultItem}>
-            从 {transfer.args.from} 转账给 {transfer.args.to}  <br/> USDC: {Number(transfer.args.value)}  <br/> 交易ID: {transfer.transactionHash}
+            从 <strong>{transfer.args.from}</strong> 转账给 <strong>{transfer.args.to}</strong>  <br/> USDC: <strong>{Number(transfer.args.value)}</strong>  <br/> 交易ID: <strong>{transfer.transactionHash}</strong>
           </li>
         ))}
       </ul>
