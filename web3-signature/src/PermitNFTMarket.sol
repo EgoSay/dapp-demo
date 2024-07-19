@@ -3,10 +3,13 @@ pragma solidity ^0.8.0;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import {ERC20Permit, EIP712, ERC20, Nonces} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {console} from "forge-std/console.sol";
 
-contract NFTMarket {
 
+contract PermitNFTMarket is EIP712 {
+    using ECDSA for bytes32;
     // define nft sale info
     struct nftTokens {
         address seller;
@@ -17,6 +20,15 @@ contract NFTMarket {
 
     // Mapping to track the nft type to nftTokens
     mapping(address => mapping(uint256 => nftTokens)) nftSaleMap;
+    // 存储 nft 售卖情况
+    mapping(bytes32 => bool) filledOrders;
+    // 项目方，也就是白名单签署方
+    address public whitelistSigner;
+
+    bytes32 public constant LISTING_TYPEHASH =
+        keccak256("PermitNFTMarketList(address seller,address nftContract,uint256 tokenId,uint256 price)");
+    bytes32 public constant WL_TYPEHASH =
+        keccak256("PermitNFTWhiteList(address wlSigner, address user)");
 
     // event to log nft trade record
     event NFTListed(address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 price);
@@ -24,15 +36,16 @@ contract NFTMarket {
 
     // my ERC20 token contract address
     IERC20 private paymentTokenAddr;
-    IERC20Permit private permitToken;
+    ERC20Permit private permitToken;
 
-    constructor(IERC20 _paymentToken, IERC20Permit _permitToken) {
-        paymentTokenAddr = _paymentToken;
-        permitToken = _permitToken;
+    constructor(address _permitTokenAddr, address _whitelistSigner) EIP712("PermitNFTMarket", "version 1") {
+        permitToken = ERC20Permit(_permitTokenAddr);
+        whitelistSigner = _whitelistSigner;
     }
 
     // add nft to the market list
     function list(address nftContract, uint256 tokenId, uint256 price) external returns (bool) {
+        // TODO nft owner 需要签名，授权 nftMarket 上架 nft 信息
         require(price > 0, "nft price must greater than 0");
         address owner = IERC721(nftContract).ownerOf(tokenId);
         require(msg.sender == owner, "not nft owner");
@@ -52,10 +65,10 @@ contract NFTMarket {
     // buy nft from the market
     function buyNFT(address nftContract, uint256 tokenId) public returns (bool) {
         nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
-        uint256 balance = paymentTokenAddr.balanceOf(msg.sender);
+        uint256 balance = permitToken.balanceOf(msg.sender);
         require(balance >= nftInfo.price, " have no enough balance");
         // transfer erc20 token to the seller
-        paymentTokenAddr.transferFrom(msg.sender, nftInfo.seller, nftInfo.price);
+        permitToken.transferFrom(msg.sender, nftInfo.seller, nftInfo.price);
         // erc721 transfer nft to the buyer
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
         // delist nft from the market
@@ -103,14 +116,88 @@ contract NFTMarket {
         return (addr, value);
     }
 
-    function permitBuy() public returns (bool) {
+    function permitBuy(
+        address nftContract,
+        uint256 tokenId,
+        uint256 deadline,
+        bytes calldata signatureForWL,
+        bytes calldata signatureForSellOrder,
+        bytes calldata signatureForApprove
+    ) public returns (bool) {
+        nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
 
-        //检查上架信息是否存在， [检查后为了防止重入，删除上架信息]检查白单签名是否来自于项目方的签署
-        // 检查白名单签名是否来自项目方的签署
-        // 执行 ERC20 的 permit 进行 授权
-        // 执行 ERCEO 的转账
-        // 执行 NFT 的转账
+        verifySignature(nftInfo, nftContract, signatureForWL, signatureForSellOrder);
+
+        handlePurchase(nftInfo, nftContract, deadline, signatureForApprove);
+        
+        return true;
 
     }
+
+    function verifySignature (
+        nftTokens memory nftInfo,
+        address nftContract,
+        bytes calldata signatureForWL,
+        bytes calldata signatureForSellOrder
+    ) private {
+        // 检查白名单签名
+        bytes32 wlDigest = _hashTypedDataV4(
+            keccak256(abi.encode(WL_TYPEHASH, whitelistSigner, address(msg.sender)))
+        );
+       
+        address wlSigner = ECDSA.recover(wlDigest, signatureForWL);
+        require(wlSigner == whitelistSigner, "You are not in WL");
+        console.log("wl  check is ok");
+
+        // 检查上架信息是否存在， [检查后为了防止重入，删除上架信息]
+        require(nftInfo.seller != address(0), "nft not on sale");
+        delete nftSaleMap[nftContract][nftInfo.tokenId];
+        
+        // 检查 nft 上架信息是否来自 nft owner 的签名授权
+        bytes32 orderHash = _hashTypedDataV4(
+            keccak256(abi.encode(LISTING_TYPEHASH, nftInfo.seller, nftInfo.nftContract, nftInfo.tokenId, nftInfo.price))
+        );
+        // console.logBytes32(orderHash);
+        require(filledOrders[orderHash] == false, "Order already filled");
+        filledOrders[orderHash]=true;
+        address nftOwner= IERC721(nftContract).ownerOf(nftInfo.tokenId);
+        address orderSeller = ECDSA.recover(orderHash, signatureForSellOrder);
+        // console.log(orderSeller);
+        require(orderSeller != nftOwner, "nft seller not the nft owner");
+        console.log("order check is ok");
+    }
+
+     function handlePurchase(
+        nftTokens memory nftInfo,
+        address nftContract,
+        uint256 deadline,
+        bytes memory signatureForApprove) private {
+        // 执行 ERC20 的 permit 进行 授权
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        // ecrecover takes the signature parameters, and the only way to get them
+        // currently is to use assembly.
+        /// @solidity memory-safe-assembly
+        assembly {
+            r := mload(add(signatureForApprove, 32))
+            s := mload(add(signatureForApprove, 64))
+            v := byte(0, mload(add(signatureForApprove, 96)))
+        }
+        permitToken.permit(msg.sender, address(this), nftInfo.price, deadline, v, r, s);
+        
+        // 执行 ERCE2O 的转账
+        require(permitToken.transferFrom(msg.sender, nftInfo.seller, nftInfo.price), "TOKEN_TRANSFER_OUT_FAILED");
+        console.log("token transfer is ok");
+        // 执行 NFT 的转账
+        IERC721(nftContract).transferFrom(address(this), msg.sender, nftInfo.tokenId);
+        emit NFTBought(msg.sender, nftContract, nftInfo.tokenId);
+
+     }
+     
+     function getHashData(bytes32 structHash) public view returns (bytes32) {
+        return _hashTypedDataV4(structHash);
+    }
+
 
 }

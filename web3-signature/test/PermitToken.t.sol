@@ -53,8 +53,7 @@ contract ERC20Test is Test {
                 ))
             )
         );
-        console.logBytes32(digest);
-
+        
         // 签名
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPrivateKey, digest);
 

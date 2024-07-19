@@ -12,7 +12,7 @@ contract PermitERC20Token is ERC20Permit, Ownable {
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     constructor() ERC20("PermitERC20Token", "PTK") ERC20Permit("PermitERC20Token") Ownable(msg.sender) {
-        // _mint(msg.sender,  10000 * decimals());
+        _mint(msg.sender,  10000 * 10 ** decimals());
     }
 
     function mint(address to, uint256 amount) public onlyOwner {
@@ -26,6 +26,10 @@ contract PermitERC20Token is ERC20Permit, Ownable {
 
     function getDomainSeparator() public view returns (bytes32) {
         return _domainSeparatorV4();
+    }
+
+    function getHashData(bytes32 structHash) public view returns (bytes32) {
+        return _hashTypedDataV4(structHash);
     }
 
 

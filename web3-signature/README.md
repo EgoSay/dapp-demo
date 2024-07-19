@@ -1,66 +1,23 @@
-## Foundry
+## TokenBank 测试
+> 要求: 修改 TokenBank 存款合约 ,添加一个函数 permitDeposit 以支持离线签名授权（permit）进行存款。
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+代码链接: [PermitTokenBank](./src/PermitTokenBank.sol)
 
-Foundry consists of:
+ [Token 存款测试用例](./test/PermitToken.t.sol)
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+ 测试结果
+![Token 存款测试结果](./resources/TokenBankDepositTest.png)
 
-## Documentation
+## NTFMarket 测试
+> 要求: 添加功能 permitBuy() 实现只有离线授权的白名单地址才可以购买 NFT （用自己的名称发行 NFT，再上架）
+> 
+> 白名单具体实现逻辑为：项目方给白名单地址签名，白名单用户拿到签名信息后，传给 permitBuy() 函数，在permitBuy()中判断时候是经过许可的白名单用户，如果是，才可以进行后续购买，否则 revert
 
-https://book.getfoundry.sh/
+代码链接: 
 
-## Usage
+[PermitNFTMarket](./src/PermitNFTMarket.sol)
 
-### Build
+测试用例: [PermitNFTMarket.t.sol](./test/PermitNFTMarket.t.sol)
 
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+测试结果: 
+[testPermitDeposit.log](./test/testPermitDeposit.log)
