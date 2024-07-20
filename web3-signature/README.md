@@ -17,7 +17,7 @@
 
 [PermitNFTMarket](./src/PermitNFTMarket.sol)
 
-测试用例: [PermitNFTMarket.t.sol](./test/PermitNFTMarket.t.sol)
+测试用例: [PermitNFTMarketTest](./test/PermitNFTMarketTest.sol)
 
 测试结果: 
-[testPermitDeposit.log](./test/testPermitDeposit.log)
+[testPermitBuy.log](./test/testPermitBuy.log)

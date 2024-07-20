@@ -7,7 +7,6 @@ import {IERC20Permit, EIP712, ERC20, Nonces} from "@openzeppelin/contracts/token
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {console} from "forge-std/console.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {PermitNFT} from "../src/PermitNFT.sol";
 
 
 contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) {
@@ -187,8 +186,16 @@ contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) 
 
         // nft 签名授权
         (bytes32 r, bytes32 s, uint8 v) = decodeSign(signatureForSellOrder);
-        PermitNFT(nftOrder.nftContract).permit(nftOrder.tokenId, address(this), nftOrder.deadline, v, r, s);
-        console.log("order check is ok");
+        // PermitNFT(nftOrder.nftContract).permit(nftOrder.tokenId, address(this), nftOrder.deadline, v, r, s);
+        (bool result, ) = (nftOrder.nftContract).call(
+                abi.encodeWithSignature("permit(uint256,address,uint256,uint8,bytes32,bytes32)",
+                nftOrder.tokenId, 
+                address(this), 
+                nftOrder.deadline, 
+                v, r, s
+            )
+        );
+        require(result, "nft permit failed");
     }
 
 
