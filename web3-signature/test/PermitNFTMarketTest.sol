@@ -4,9 +4,10 @@ pragma solidity ^0.8.20;
 import {console, StdCheats, Test} from "forge-std/Test.sol";
 import {PermitERC20Token} from "../src/PermitERC20Token.sol";
 import {PermitNFTMarket} from "../src/PermitNFTMarket.sol";
-import {MyNFT} from "../src/MyNFT.sol";
+import {PermitNFT} from "../src/PermitNFT.sol";
 import {IERC20Permit, ERC20Permit, EIP712, ERC20, Nonces} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 contract PermitNFTMarketTest is Test {
  
@@ -20,58 +21,48 @@ contract PermitNFTMarketTest is Test {
 
     PermitNFTMarket market;
     PermitERC20Token token;
-    MyNFT nftContract;
+    PermitNFT nftContract;
     uint256 nftDeafultPrice = 888 * 10**18;
     uint256 init_price = 1000 * 10**18;
-
-    bytes32 public constant LISTING_TYPEHASH =
-        keccak256("PermitNFTMarketList(address seller,address nftContract,uint256 tokenId,uint256 price)");
-    bytes32 public constant WL_TYPEHASH =
-        keccak256("PermitNFTWhiteList(address wlSigner, address user)");
+    uint256 deadline = block.timestamp + 1 days;
 
     // Mappingto track nft tokenId and it's owner
     mapping(address => uint256) nftOwnerMap;
 
 
     function setUp() public {
-        nftContract = new MyNFT();
+        nftContract = new PermitNFT();
         token = new PermitERC20Token();
-        market = new PermitNFTMarket(address(token), whitelistSigner);
+        market = new PermitNFTMarket();
 
         // mint nft 给 seller 
-        string memory tokenURI = generateRandomURI();
-        uint256 tokenId = nftContract.mint(seller, tokenURI);
+        uint256 tokenId = nftContract.mint(seller);
         nftOwnerMap[seller] = tokenId;
-
-        // 上架 nft
-        vm.startPrank(seller);
+        vm.prank(seller);
         nftContract.approve(address(market), tokenId);
-        bool listedRsult = market.list(address(nftContract), tokenId, nftDeafultPrice);
-        assertTrue(listedRsult);
-        vm.stopPrank();
-    }
-
-     function generateRandomURI() public view returns (string memory) {
-        bytes32 seed = keccak256(abi.encodePacked(block.number, tx.origin));
-        bytes memory randomBytes = new bytes(32);
-        for (uint256 i = 0; i < 32; i++) {
-            randomBytes[i] = seed[i];
-        }
-        return string(randomBytes);
+        market.setWhiteListSigner(whitelistSigner);
     }
 
     function testPermitBuyNFT() public {
+
+         // nft owner 签名授权 nftMarket 上架出售
+        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(sellerPrivateKey, getSignatureForNft());
+        bytes memory signatureForNft = abi.encodePacked(r2, s2, v2);
+
+        // 上架 nft
+        vm.startPrank(seller);
+        bool listedRsult = prepareListNft(signatureForNft);
+        assertTrue(listedRsult);
+        vm.stopPrank();
+
         (uint8 v1, bytes32 r1, bytes32 s1) =vm.sign(whitelistSignerPrivateKey, getSignatureForWL());
         bytes memory signatureForWL = abi.encodePacked(r1, s1, v1);
 
-        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(sellerPrivateKey, getSignatureForSellOrder());
-        bytes memory signatureForSellOrder = abi.encodePacked(r2, s2, v2);
-
-        (uint8 v3, bytes32 r3, bytes32 s3) = vm.sign(buyerPrivateKey, getSignatureForApprove());
+        (uint8 v3, bytes32 r3, bytes32 s3) = vm.sign(buyerPrivateKey, getSignatureForTokenApprove());
         bytes memory signatureForApprove = abi.encodePacked(r3, s3, v3);
 
         // buyer 执行购买
-        doPermitBuy(signatureForWL, signatureForSellOrder, signatureForApprove);
+        doPermitBuy(signatureForWL, signatureForNft, signatureForApprove);
 
         // 验证 nft owner 是否转移
         assertEq(buyer, nftContract.ownerOf(nftOwnerMap[seller]));
@@ -80,31 +71,42 @@ contract PermitNFTMarketTest is Test {
         assertEq(token.balanceOf(seller), (nftDeafultPrice));
     }
 
+    function prepareListNft(bytes memory signatureForNft) private returns(bool) {
+        // 上架 nft
+        return market.list(address(nftContract), 
+                            nftOwnerMap[seller], 
+                            address(token), 
+                            nftDeafultPrice, 
+                            deadline, 
+                            signatureForNft);
+    }
+
     function getSignatureForWL() view private returns (bytes32){
         bytes32 signatureForWLDigest = market.getHashData(
                 keccak256(abi.encode(
-                    WL_TYPEHASH,
+                    market.getPermitTypehash(),
                     whitelistSigner,
                     buyer
                 )));
+        console.logBytes32(signatureForWLDigest);
         return signatureForWLDigest;
     }
 
-    function getSignatureForSellOrder() view private returns (bytes32){
+    function getSignatureForNft() view private returns (bytes32){
         uint256 tokenId = nftOwnerMap[seller];
-        return market.getHashData(
-                keccak256(abi.encode(
-                    LISTING_TYPEHASH,
+        bytes32 structHash = keccak256(abi.encode(
+                    nftContract.getPermitTypehash(),
                     seller,
+                    address(market),
                     address(nftContract),
                     tokenId,
-                    nftDeafultPrice
-            )));
+                    deadline
+            ));
+        return nftContract.getHashData(structHash);
     }
 
-    function getSignatureForApprove () view private returns (bytes32){
+    function getSignatureForTokenApprove () view private returns (bytes32){
         uint256 nonce = token.nonces(buyer);
-        uint256 deadline = block.timestamp + 1 days;
         // 签名
         return token.getHashData(
                 keccak256(abi.encode(
@@ -124,13 +126,13 @@ contract PermitNFTMarketTest is Test {
         bytes memory signatureForApprove
     ) private {
         uint256 tokenId = nftOwnerMap[seller];
-        uint256 deadline = block.timestamp + 1 days;
+
         deal(address(token), buyer, init_price);
         deal(buyer, init_price);
 
         // buyer 执行购买
         vm.startPrank(buyer);
-        bool buyResult = market.permitBuy(address(nftContract), tokenId, deadline, signatureForWL, signatureForSellOrder, signatureForApprove);
+        bool buyResult = market.permitBuy(address(nftContract), tokenId, signatureForWL, signatureForSellOrder, signatureForApprove);
         assertTrue(buyResult);
         vm.stopPrank();
     }

@@ -1,0 +1,47 @@
+No files changed, compilation skipped
+
+Ran 1 test for test/PermitToken.t.sol:ERC20Test
+[PASS] testPermitDeposit(uint256) (runs: 256, μ: 118071, ~: 118071)
+Traces:
+  [118071] ERC20Test::testPermitDeposit(31631 [3.163e4])
+    ├─ [0] VM::assume(true) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7)
+    │   └─ ← [Return] 
+    ├─ [2616] PermitERC20Token::nonces(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [364] PermitERC20Token::DOMAIN_SEPARATOR() [staticcall]
+    │   └─ ← [Return] 0x11990377fa9b64bcd39fa99838fab7a5e28dcee136a846f61b047e5e091e3a1f
+    ├─ [304] PermitERC20Token::getPermitTypehash() [staticcall]
+    │   └─ ← [Return] 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9
+    ├─ [0] VM::sign("<pk>", 0x2066f4cadcccffb62f3991c563c4b8e6b303ca2497c4a044f13059061d8f5b7f) [staticcall]
+    │   └─ ← [Return] 27, 0x32c22d32f5d7832e66a5aef312963d613a35abf0cf42eebd408450aa6033a132, 0x6ec5ead944b6f2250fe0e902d917b732a4ab6c1ee897baf30c1fddf65ac19d8f
+    ├─ [110914] PermitTokenBank::permitDeposit(31631 [3.163e4], 86401 [8.64e4], 27, 0x32c22d32f5d7832e66a5aef312963d613a35abf0cf42eebd408450aa6033a132, 0x6ec5ead944b6f2250fe0e902d917b732a4ab6c1ee897baf30c1fddf65ac19d8f)
+    │   ├─ [2651] PermitERC20Token::balanceOf(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) [staticcall]
+    │   │   └─ ← [Return] 1000000000000000000 [1e18]
+    │   ├─ [49462] PermitERC20Token::permit(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, PermitTokenBank: [0x2e234DAe75C793f67A35089C9d99245E1C58470b], 31631 [3.163e4], 86401 [8.64e4], 27, 0x32c22d32f5d7832e66a5aef312963d613a35abf0cf42eebd408450aa6033a132, 0x6ec5ead944b6f2250fe0e902d917b732a4ab6c1ee897baf30c1fddf65ac19d8f)
+    │   │   ├─ [3000] PRECOMPILES::ecrecover(0x2066f4cadcccffb62f3991c563c4b8e6b303ca2497c4a044f13059061d8f5b7f, 27, 22958722712203433040407697382625451048761797832321338882207785739104889839922, 50104103082110715600077481906703315889153952369136761883923843185874384821647) [staticcall]
+    │   │   │   └─ ← [Return] 0x000000000000000000000000e05fcc23807536bee418f142d19fa0d21bb0cff7
+    │   │   ├─ emit Approval(owner: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, spender: PermitTokenBank: [0x2e234DAe75C793f67A35089C9d99245E1C58470b], value: 31631 [3.163e4])
+    │   │   └─ ← [Stop] 
+    │   ├─ [28885] PermitERC20Token::transferFrom(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, PermitTokenBank: [0x2e234DAe75C793f67A35089C9d99245E1C58470b], 31631 [3.163e4])
+    │   │   ├─ emit Transfer(from: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, to: PermitTokenBank: [0x2e234DAe75C793f67A35089C9d99245E1C58470b], value: 31631 [3.163e4])
+    │   │   └─ ← [Return] true
+    │   ├─ emit Deposit(from: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, to: PermitTokenBank: [0x2e234DAe75C793f67A35089C9d99245E1C58470b], amount: 31631 [3.163e4])
+    │   ├─ emit Banlances(user: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, amount: 31631 [3.163e4])
+    │   └─ ← [Stop] 
+    ├─ [651] PermitERC20Token::balanceOf(PermitTokenBank: [0x2e234DAe75C793f67A35089C9d99245E1C58470b]) [staticcall]
+    │   └─ ← [Return] 31631 [3.163e4]
+    ├─ [0] VM::assertEq(31631 [3.163e4], 31631 [3.163e4]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [559] PermitTokenBank::getUserBalance(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) [staticcall]
+    │   └─ ← [Return] 31631 [3.163e4]
+    ├─ [0] VM::assertEq(31631 [3.163e4], 31631 [3.163e4]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 120.29ms (108.14ms CPU time)
+
+Ran 1 test suite in 1.53s (120.29ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
