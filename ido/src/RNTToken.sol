@@ -4,8 +4,8 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract IDOToken is ERC20Permit, Ownable{
-    constructor() ERC20("IDOToken", "RNT") ERC20Permit("IDOToken") Ownable(msg.sender) {
+contract RNTToken is ERC20Permit, Ownable{
+    constructor() ERC20("RNTToken", "RNT") ERC20Permit("RNTToken") Ownable(msg.sender) {
         _mint(msg.sender, 10000 * 10 ** decimals());
     }
 

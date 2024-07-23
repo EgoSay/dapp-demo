@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ECDSA} from "@openzeppelin/contracts/utils/";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
@@ -12,8 +11,9 @@ contract MyIDO is Ownable(msg.sender){
     
     // 预售价格
     uint256 public immutable preSalePrice = 0.0001 ether;
-    // limit user max preSale amount
-    uint256 public immutable maxPreSaleAmount = 100_000;
+    // limit user min and max preSale amount
+    uint256 public immutable maxPreSaleAmount = 1000;
+    uint256 public immutable minPreSaleAmount = 100;
     // 预售目标
     uint256 public immutable preSaleTarget = 100 ether;
     // 预售超募上限
@@ -52,11 +52,11 @@ contract MyIDO is Ownable(msg.sender){
      * @param amount 用户计划参与预售的数量
      */
     function preSale(uint256 amount) public isOnPreSale() payable {
-        require(amount > 0 && amount <= maxPreSaleAmount, "PreSale: PURCHASE_AMOUNT_INVALID");
+        require(amount > minPreSaleAmount && amount <= maxPreSaleAmount, "PreSale: PURCHASE_AMOUNT_INVALID");
         uint256 amountToPay = amount * preSalePrice;
         // check user eth balance
         require(msg.value < amountToPay, "Insufficiant ETH");
-        require(amountToPay <= preSaleCap - preSaleRaised, "PreSale is full");
+        require(amountToPay <= (preSaleCap - preSaleRaised), "PreSale is full");
        
         // update preSaleRaised
         preSaleRaised += amountToPay;
@@ -64,6 +64,7 @@ contract MyIDO is Ownable(msg.sender){
         // update preSaleParticipantAmount
         preSaleParticipantAmount[msg.sender] += amountToPay;
         payable(address(this)).transfer(amountToPay);
+        emit PreSale(msg.sender, amount);
     }
 
 
@@ -76,6 +77,7 @@ contract MyIDO is Ownable(msg.sender){
         require(preSaleParticipantAmount[refunder] > 0, "No refund");
         payable(refunder).transfer(preSaleParticipantAmount[refunder]);
         preSaleParticipantAmount[refunder] = 0;
+        emit Refund(refunder, preSaleParticipantAmount[refunder]);
     }
 
     /**
@@ -83,9 +85,10 @@ contract MyIDO is Ownable(msg.sender){
      */
     function claim() public OnlySuccess() {
         require(preSaleParticipantAmount[msg.sender] > 0, "No claim");
-        canClaimAmount = preSaleParticipantAmount[msg.sender] * 1e12 / (preSaleRaised * 1e12);
+        uint256 canClaimAmount = preSaleParticipantAmount[msg.sender] * 1e12 / (preSaleRaised * 1e12);
         preSaleParticipantAmount[msg.sender] = 0;
         token.transfer(msg.sender, canClaimAmount);
+        emit Claim(msg.sender, canClaimAmount);
     }
 
     /**
@@ -96,5 +99,15 @@ contract MyIDO is Ownable(msg.sender){
         uint256 projectCanWithdraw = preSaleRaised * 1 / 10;
         payable(owner()).transfer(projectCanWithdraw);
         preSaleRaised -= projectCanWithdraw;
+        emit Withdraw(msg.sender, projectCanWithdraw);
     }
+
+    function getPreSaleAmount() public view returns (uint256) {
+        return preSaleParticipantAmount[msg.sender];
+    }
+
+    event PreSale(address indexed user, uint256 amount);
+    event Refund(address indexed refunder, uint256 amount);
+    event Claim(address indexed claimer, uint256 amount);
+    event Withdraw(address indexed withdrawer, uint256 amount);
 }
