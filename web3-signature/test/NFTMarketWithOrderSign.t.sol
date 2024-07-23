@@ -126,13 +126,11 @@ contract PermitNFTMarketTest is Test {
         bytes memory signatureForApprove
     ) private {
         deal(buyer, init_price);
-        console.log(buyer);
-        console.log("buyer balance: ", buyer.balance);
 
         // buyer 执行购买
         vm.startPrank(buyer);
         // buyer.approve(address(market), nftDeafultPrice);
-        bool buyResult = market.permitBuy(nftOrder, signatureForWL, signatureForSellOrder, signatureForApprove);
+        bool buyResult = market.permitBuy{value: nftDeafultPrice}(nftOrder, signatureForWL, signatureForSellOrder, signatureForApprove);
         assertTrue(buyResult);
         vm.stopPrank();
     }

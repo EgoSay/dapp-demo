@@ -73,9 +73,6 @@ contract NFTMarketWithOrderSign is EIP712("NFTMarketWithOrderSign", "1"), Ownabl
         uint256 fee = feeReceiver == address(0) ? 0 : order.price * feeBP / 10000;
         // safe check
         if (order.payToken == ETH_FLAG) {
-            console.log(msg.sender);
-            console.log(order.price);
-            console.log(msg.value);
             require(msg.value >= order.price, "PermitNFTMarket: wrong eth value");
         } else {
             require(msg.value == 0, "PermitNFTMarket: wrong eth value");
@@ -103,7 +100,7 @@ contract NFTMarketWithOrderSign is EIP712("NFTMarketWithOrderSign", "1"), Ownabl
         bytes calldata signatureForWL,
         bytes calldata signatureForSellOrder,
         bytes calldata signatureForApprove
-    ) public returns (bool) {        
+    ) public payable returns (bool) {        
         
         _verifyWL(signatureForWL);
 
