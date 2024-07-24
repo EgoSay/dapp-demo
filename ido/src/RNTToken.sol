@@ -6,7 +6,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract RNTToken is ERC20Permit, Ownable{
     constructor() ERC20("RNTToken", "RNT") ERC20Permit("RNTToken") Ownable(msg.sender) {
-        _mint(msg.sender, 10000 * 10 ** decimals());
+        _mint(msg.sender, 100_0000 * 10 ** decimals());
     }
 
     function mint(address to, uint256 amount) public onlyOwner {

@@ -3,17 +3,22 @@ pragma solidity ^0.8.20;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {console} from "forge-std/console.sol";
 
 
 contract MyIDO is Ownable(msg.sender){
 
     IERC20 public token;
+    constructor(address _token) {
+        token = IERC20(_token);
+    }
     
     // 预售价格
-    uint256 public immutable preSalePrice = 0.0001 ether;
+    uint256 public constant preSalePrice = 0.0001 ether;
+    uint256 public constant preSaleTotal = 100_0000;
     // limit user min and max preSale amount
-    uint256 public immutable maxPreSaleAmount = 1000;
-    uint256 public immutable minPreSaleAmount = 100;
+    uint256 public immutable maxPreSaleAmount = 0.1 ether;
+    uint256 public immutable minPreSaleAmount = 0.01 ether;
     // 预售目标
     uint256 public immutable preSaleTarget = 100 ether;
     // 预售超募上限
@@ -24,47 +29,42 @@ contract MyIDO is Ownable(msg.sender){
     // 预售结束时间
     uint256 public preSaleEndTime = preSaleStartTime + 7 days;
     // 预售已募集金额
-    uint256 public preSaleRaised;
+    // uint256 public preSaleRaised;
+    // 预售成功后，项目方可提现比例 => 10 %
+    uint256 public projectCanWithdrawRate = 10;
 
     // 预售参与用户及其参与数量
     mapping(address => uint256) public preSaleParticipantAmount;
    
     modifier isOnPreSale() {
         require(block.timestamp >= preSaleStartTime && block.timestamp <= preSaleEndTime, "PreSale is not start");
-        require(preSaleRaised <= preSaleCap, "PreSale is full");
+        require(address(this).balance <= preSaleCap, "PreSale is full");
         _;
     }
     modifier OnlySuccess() {
         require(block.timestamp > preSaleEndTime, "PreSale is not end");
-        require(preSaleRaised >= preSaleTarget, "PreSale is not enough");
+        require(address(this).balance >= preSaleTarget, "PreSale is not enough");
         _;
     }
 
     modifier OnlyFailed() {
         require(block.timestamp > preSaleEndTime, "PreSale is not end");
-        require(preSaleRaised < preSaleTarget, "PreSale is success");
+        require(address(this).balance < preSaleTarget, "PreSale is success");
         _;
     }
 
-    /**
+    /*
      * 开启预售: 支持对给定的任意ERC20开启预售，设定预售价格，募集ETH目标，超募上限，预售时长
      * 任意用户可支付ETH参与预售
      * @param amount 用户计划参与预售的数量
      */
-    function preSale(uint256 amount) public isOnPreSale() payable {
-        require(amount > minPreSaleAmount && amount <= maxPreSaleAmount, "PreSale: PURCHASE_AMOUNT_INVALID");
-        uint256 amountToPay = amount * preSalePrice;
-        // check user eth balance
-        require(msg.value < amountToPay, "Insufficiant ETH");
-        require(amountToPay <= (preSaleCap - preSaleRaised), "PreSale is full");
-       
-        // update preSaleRaised
-        preSaleRaised += amountToPay;
+    function preSale() public isOnPreSale() payable {
+        require(msg.value >= minPreSaleAmount && msg.value <= maxPreSaleAmount, "PreSale: PURCHASE_AMOUNT_INVALID");
+        require(msg.value <= (preSaleCap - address(this).balance), "PreSale is full");
 
         // update preSaleParticipantAmount
-        preSaleParticipantAmount[msg.sender] += amountToPay;
-        payable(address(this)).transfer(amountToPay);
-        emit PreSale(msg.sender, amount);
+        preSaleParticipantAmount[msg.sender] += msg.value;
+        emit PreSale(msg.sender, msg.value);
     }
 
 
@@ -75,9 +75,10 @@ contract MyIDO is Ownable(msg.sender){
     function refund() public OnlyFailed() {
         address refunder = msg.sender;
         require(preSaleParticipantAmount[refunder] > 0, "No refund");
-        payable(refunder).transfer(preSaleParticipantAmount[refunder]);
-        preSaleParticipantAmount[refunder] = 0;
+        (bool success,) = refunder.call{value: preSaleParticipantAmount[refunder]}("");
+        require(success, "Refund: FAILED");
         emit Refund(refunder, preSaleParticipantAmount[refunder]);
+        preSaleParticipantAmount[refunder] = 0;
     }
 
     /**
@@ -85,18 +86,19 @@ contract MyIDO is Ownable(msg.sender){
      */
     function claim() public OnlySuccess() {
         require(preSaleParticipantAmount[msg.sender] > 0, "No claim");
-        uint256 canClaimAmount = preSaleParticipantAmount[msg.sender] * 1e12 / (preSaleRaised * 1e12);
+        uint256 canClaimAmount = preSaleParticipantAmount[msg.sender] * preSaleTotal / (address(this).balance);
         preSaleParticipantAmount[msg.sender] = 0;
         token.transfer(msg.sender, canClaimAmount);
         emit Claim(msg.sender, canClaimAmount);
     }
 
     /**
-     * 预售成功，用户可领取 Token，且项目方可提现募集的ETH
+     * 预售成功，项目方可提现募集的ETH
      */
     function withdraw() public OnlySuccess() {
         // 项目方只能提取一定比例的募集金额
-        uint256 projectCanWithdraw = preSaleRaised * 1 / 10;
+        uint256 preSaleRaised = address(this).balance;
+        uint256 projectCanWithdraw = preSaleRaised * projectCanWithdrawRate / 100;
         payable(owner()).transfer(projectCanWithdraw);
         preSaleRaised -= projectCanWithdraw;
         emit Withdraw(msg.sender, projectCanWithdraw);
