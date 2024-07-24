@@ -1,0 +1,218 @@
+Compiling 2 files with Solc 0.8.20
+Solc 0.8.20 finished in 2.83s
+Compiler run successful!
+
+Ran 5 tests for test/IDOTest.sol:IDOTest
+[PASS] testInvalidAmountPreSale() (gas: 45010)
+Logs:
+  >>>>> =========================== 测试预售金额无效 ===========================<<<<<<
+  test user buy amount is invalid
+
+Traces:
+  [45010] IDOTest::testInvalidAmountPreSale()
+    ├─ [0] console::log(">>>>> =========================== 测试预售金额无效 ===========================<<<<<<") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [2308] MyIDO::preSaleStartTime() [staticcall]
+    │   └─ ← [Return] 1721664000 [1.721e9]
+    ├─ [0] VM::warp(1721664000 [1.721e9])
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   └─ ← [Return] 
+    ├─ [252] MyIDO::minPreSaleAmount() [staticcall]
+    │   └─ ← [Return] 10000000000000000 [1e16]
+    ├─ [0] VM::deal(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], 9999999999999999 [9.999e15])
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(PreSale: PURCHASE_AMOUNT_INVALID)
+    │   └─ ← [Return] 
+    ├─ [2584] MyIDO::preSale{value: 9999999999999999}()
+    │   └─ ← [Revert] revert: PreSale: PURCHASE_AMOUNT_INVALID
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    ├─ [0] console::log("test user buy amount is invalid") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [308] MyIDO::preSaleStartTime() [staticcall]
+    │   └─ ← [Return] 1721664000 [1.721e9]
+    ├─ [0] VM::warp(1721664000 [1.721e9])
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e])
+    │   └─ ← [Return] 
+    ├─ [295] MyIDO::maxPreSaleAmount() [staticcall]
+    │   └─ ← [Return] 100000000000000000 [1e17]
+    ├─ [0] VM::deal(bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e], 100000000000000001 [1e17])
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(PreSale: PURCHASE_AMOUNT_INVALID)
+    │   └─ ← [Return] 
+    ├─ [2597] MyIDO::preSale{value: 100000000000000001}()
+    │   └─ ← [Revert] revert: PreSale: PURCHASE_AMOUNT_INVALID
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testPreSaleNotStart() (gas: 27646)
+Logs:
+  >>>>>=========================== 测试未到预售开始时间 ===========================<<<<<<
+
+Traces:
+  [27646] IDOTest::testPreSaleNotStart()
+    ├─ [0] console::log(">>>>>=========================== 测试未到预售开始时间 ===========================<<<<<<") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [2308] MyIDO::preSaleStartTime() [staticcall]
+    │   └─ ← [Return] 1721664000 [1.721e9]
+    ├─ [0] VM::warp(1721660400 [1.721e9])
+    │   └─ ← [Return] 
+    ├─ [0] VM::deal(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], 80000000000000000 [8e16])
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(PreSale is not start)
+    │   └─ ← [Return] 
+    ├─ [401] MyIDO::preSale{value: 80000000000000000}()
+    │   └─ ← [Revert] revert: PreSale is not start
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testPreSaleOverCap() (gas: 30377)
+Logs:
+  >>>>> =========================== 测试预售募集金额已达上限，预售结束 ===========================<<<<<<
+
+Traces:
+  [30377] IDOTest::testPreSaleOverCap()
+    ├─ [0] console::log(">>>>> =========================== 测试预售募集金额已达上限，预售结束 ===========================<<<<<<") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] testPreSaleOverCap: [0x7dd694a6c42a21557659C265Eab49cd172671adF]
+    ├─ [0] VM::label(testPreSaleOverCap: [0x7dd694a6c42a21557659C265Eab49cd172671adF], "testPreSaleOverCap")
+    │   └─ ← [Return] 
+    ├─ [2308] MyIDO::preSaleStartTime() [staticcall]
+    │   └─ ← [Return] 1721664000 [1.721e9]
+    ├─ [0] VM::warp(1721667600 [1.721e9])
+    │   └─ ← [Return] 
+    ├─ [229] MyIDO::preSaleCap() [staticcall]
+    │   └─ ← [Return] 200000000000000000000 [2e20]
+    ├─ [0] VM::deal(MyIDO: [0xccc596550209Bb3F8990830B308a30047E3053D9], 201000000000000000000 [2.01e20])
+    │   └─ ← [Return] 
+    ├─ [0] VM::deal(testPreSaleOverCap: [0x7dd694a6c42a21557659C265Eab49cd172671adF], 80000000000000000 [8e16])
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(testPreSaleOverCap: [0x7dd694a6c42a21557659C265Eab49cd172671adF])
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(PreSale is full)
+    │   └─ ← [Return] 
+    ├─ [2542] MyIDO::preSale{value: 80000000000000000}()
+    │   └─ ← [Revert] revert: PreSale is full
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testPreSaleSuccess() (gas: 100752)
+Logs:
+  >>>>> ===========================  测试预售成功 ===========================<<<<<<
+
+Traces:
+  [100752] IDOTest::testPreSaleSuccess()
+    ├─ [0] console::log(">>>>> ===========================  测试预售成功 ===========================<<<<<<") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [2308] MyIDO::preSaleStartTime() [staticcall]
+    │   └─ ← [Return] 1721664000 [1.721e9]
+    ├─ [0] VM::warp(1721664000 [1.721e9])
+    │   └─ ← [Return] 
+    ├─ [0] VM::deal(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], 80000000000000000 [8e16])
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   └─ ← [Return] 
+    ├─ [26292] MyIDO::preSale{value: 80000000000000000}()
+    │   ├─ emit PreSale(user: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], amount: 80000000000000000 [8e16])
+    │   └─ ← [Stop] 
+    ├─ [395] MyIDO::getPreSaleAmount() [staticcall]
+    │   └─ ← [Return] 80000000000000000 [8e16]
+    ├─ [0] VM::assertEq(80000000000000000 [8e16], 80000000000000000 [8e16]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [228] MyIDO::preSaleTarget() [staticcall]
+    │   └─ ← [Return] 100000000000000000000 [1e20]
+    ├─ [0] VM::deal(MyIDO: [0xccc596550209Bb3F8990830B308a30047E3053D9], 100000000000000000000 [1e20])
+    │   └─ ← [Return] 
+    ├─ [306] MyIDO::preSaleEndTime() [staticcall]
+    │   └─ ← [Return] 1722268800 [1.722e9]
+    ├─ [0] VM::warp(1722272400 [1.722e9])
+    │   └─ ← [Return] 
+    ├─ [37509] MyIDO::claim()
+    │   ├─ [29966] RNTToken::transfer(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], 800)
+    │   │   ├─ emit Transfer(from: MyIDO: [0xccc596550209Bb3F8990830B308a30047E3053D9], to: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], value: 800)
+    │   │   └─ ← [Return] true
+    │   ├─ emit Claim(claimer: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], amount: 800)
+    │   └─ ← [Stop] 
+    ├─ [629] RNTToken::balanceOf(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   └─ ← [Return] 800
+    ├─ [250] MyIDO::preSalePrice() [staticcall]
+    │   └─ ← [Return] 100000000000000 [1e14]
+    ├─ [0] VM::assertEq(800, 800) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(idoOwner: [0x06CD1F92167B86e807A1D82c66aE571522919BE5])
+    │   └─ ← [Return] 
+    ├─ [15669] MyIDO::withdraw()
+    │   ├─ [0] idoOwner::fallback{value: 10000000000000000000}()
+    │   │   └─ ← [Stop] 
+    │   ├─ emit Withdraw(withdrawer: idoOwner: [0x06CD1F92167B86e807A1D82c66aE571522919BE5], amount: 10000000000000000000 [1e19])
+    │   └─ ← [Stop] 
+    ├─ [373] MyIDO::projectCanWithdrawRate() [staticcall]
+    │   └─ ← [Return] 10
+    ├─ [228] MyIDO::preSaleTarget() [staticcall]
+    │   └─ ← [Return] 100000000000000000000 [1e20]
+    ├─ [0] VM::assertEq(10000000000000000000 [1e19], 10000000000000000000 [1e19]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testReFund() (gas: 69399)
+Logs:
+  >>>>> =========================== 测试预售失败，用户退款 ===========================<<<<<<
+
+Traces:
+  [71440] IDOTest::testReFund()
+    ├─ [0] console::log(">>>>> =========================== 测试预售失败，用户退款 ===========================<<<<<<") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] testReFund: [0x2BA4283bAEead7caB299fB92782dDB910b2b3102]
+    ├─ [0] VM::label(testReFund: [0x2BA4283bAEead7caB299fB92782dDB910b2b3102], "testReFund")
+    │   └─ ← [Return] 
+    ├─ [2308] MyIDO::preSaleStartTime() [staticcall]
+    │   └─ ← [Return] 1721664000 [1.721e9]
+    ├─ [0] VM::warp(1721664000 [1.721e9])
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(testReFund: [0x2BA4283bAEead7caB299fB92782dDB910b2b3102])
+    │   └─ ← [Return] 
+    ├─ [0] VM::deal(testReFund: [0x2BA4283bAEead7caB299fB92782dDB910b2b3102], 80000000000000000 [8e16])
+    │   └─ ← [Return] 
+    ├─ [26292] MyIDO::preSale{value: 80000000000000000}()
+    │   ├─ emit PreSale(user: testReFund: [0x2BA4283bAEead7caB299fB92782dDB910b2b3102], amount: 80000000000000000 [8e16])
+    │   └─ ← [Stop] 
+    ├─ [306] MyIDO::preSaleEndTime() [staticcall]
+    │   └─ ← [Return] 1722268800 [1.722e9]
+    ├─ [0] VM::warp(1722272400 [1.722e9])
+    │   └─ ← [Return] 
+    ├─ [34507] MyIDO::refund()
+    │   ├─ [0] testReFund::fallback{value: 80000000000000000}()
+    │   │   └─ ← [Stop] 
+    │   ├─ emit Refund(refunder: testReFund: [0x2BA4283bAEead7caB299fB92782dDB910b2b3102], amount: 80000000000000000 [8e16])
+    │   └─ ← [Stop] 
+    ├─ [0] VM::assertEq(80000000000000000 [8e16], 80000000000000000 [8e16]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 16.10ms (15.96ms CPU time)
+
+Ran 1 test suite in 618.55ms (16.10ms CPU time): 5 tests passed, 0 failed, 0 skipped (5 total tests)
+
+
+Test Summary:
+
+╭------------+--------+--------+---------+------------------+----------╮
+| Test Suite | Passed | Failed | Skipped |     File Path    | Duration |
++======================================================================+
+| IDOTest    |    5   |    0   |    0    | test/IDOTest.sol | 16.10ms  |
+╰------------+--------+--------+---------+------------------+----------╯
