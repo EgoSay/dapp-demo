@@ -7,11 +7,11 @@
 >- 预售成功，用户可领取 Token，且项目方可提现募集的ETH
 
 ### 实现代码
-[MyIDO.sol](./src/MyIDO.sol)
+[MyIDO.sol](../src/MyIDO.sol)
 
 
 ### 测试代码
-[IDOTest.sol](./test/IDOTest.sol)
+[IDOTest.sol](../test/IDOTest.sol)
 
 ### 测试结果
-[IDOTest.log](./test/logs/IDOTest.log)
+[IDOTest.log](../test/logs/IDOTest.log)
