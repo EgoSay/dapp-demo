@@ -6,8 +6,8 @@
 >- esRNT 是锁仓性的 RNT， 1 esRNT 在 30 天后可兑换 1 RNT，随时间线性释放，支持提前将 esRNT 兑换成 RNT，但锁定部分将被 burn 燃烧掉
 
 ### 实现代码
-[EsRNTToken.sol](./src/RNTToken.sol)
+[EsRNTToken.sol](../src/RNTToken.sol)
 
-[EsRNT.sol](./src/EsRNT.sol)
+[EsRNT.sol](../src/EsRNT.sol)
 
-[StakePool.sol](./src/StakePool.sol)
+[StakePool.sol](../src/StakePool.sol)
