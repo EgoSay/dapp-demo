@@ -52,6 +52,16 @@
   
   .resultItem {
     background: #f0f0f0;
+
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .resultItem2 {
+    background: #2c322f;
     margin-bottom: 0.5rem;
     padding: 0.5rem;
     border-radius: 5px;
