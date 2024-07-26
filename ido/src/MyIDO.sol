@@ -23,6 +23,7 @@ contract MyIDO is Ownable(msg.sender){
     uint256 public immutable preSaleTarget = 100 ether;
     // 预售超募上限
     uint256 public immutable preSaleCap = 200 ether;
+    uint256 public totalReceivedETH;
 
     // 预售开始时间, "2024-07-23 00:00:00"
     uint256 public preSaleStartTime = 1721664000;
@@ -38,18 +39,18 @@ contract MyIDO is Ownable(msg.sender){
    
     modifier isOnPreSale() {
         require(block.timestamp >= preSaleStartTime && block.timestamp <= preSaleEndTime, "PreSale is not start");
-        require(address(this).balance <= preSaleCap, "PreSale is full");
+        require(totalReceivedETH <= preSaleCap, "PreSale is full");
         _;
     }
     modifier OnlySuccess() {
         require(block.timestamp > preSaleEndTime, "PreSale is not end");
-        require(address(this).balance >= preSaleTarget, "PreSale is not enough");
+        require(totalReceivedETH >= preSaleTarget, "PreSale is not enough");
         _;
     }
 
     modifier OnlyFailed() {
         require(block.timestamp > preSaleEndTime, "PreSale is not end");
-        require(address(this).balance < preSaleTarget, "PreSale is success");
+        require(totalReceivedETH < preSaleTarget, "PreSale is success");
         _;
     }
 
@@ -60,10 +61,11 @@ contract MyIDO is Ownable(msg.sender){
      */
     function preSale() public isOnPreSale() payable {
         require(msg.value >= minPreSaleAmount && msg.value <= maxPreSaleAmount, "PreSale: PURCHASE_AMOUNT_INVALID");
-        require(msg.value <= (preSaleCap - address(this).balance), "PreSale is full");
+        require(msg.value <= (preSaleCap - totalReceivedETH), "PreSale is full");
 
         // update preSaleParticipantAmount
         preSaleParticipantAmount[msg.sender] += msg.value;
+        totalReceivedETH += msg.value;
         emit PreSale(msg.sender, msg.value);
     }
 
@@ -74,11 +76,13 @@ contract MyIDO is Ownable(msg.sender){
 
     function refund() public OnlyFailed() {
         address refunder = msg.sender;
-        require(preSaleParticipantAmount[refunder] > 0, "No refund");
-        (bool success,) = refunder.call{value: preSaleParticipantAmount[refunder]}("");
+        uint256 refundAmount = preSaleParticipantAmount[refunder];
+        require(refundAmount > 0, "No refund");
+
+        preSaleParticipantAmount[refunder] = 0;
+        (bool success,) = refunder.call{value: refundAmount}("");
         require(success, "Refund: FAILED");
         emit Refund(refunder, preSaleParticipantAmount[refunder]);
-        preSaleParticipantAmount[refunder] = 0;
     }
 
     /**
@@ -86,7 +90,9 @@ contract MyIDO is Ownable(msg.sender){
      */
     function claim() public OnlySuccess() {
         require(preSaleParticipantAmount[msg.sender] > 0, "No claim");
-        uint256 canClaimAmount = preSaleParticipantAmount[msg.sender] * preSaleTotal / (address(this).balance);
+        console.log(preSaleParticipantAmount[msg.sender]);
+        console.log(totalReceivedETH);
+        uint256 canClaimAmount = preSaleParticipantAmount[msg.sender] * preSaleTotal / totalReceivedETH;
         preSaleParticipantAmount[msg.sender] = 0;
         token.transfer(msg.sender, canClaimAmount);
         emit Claim(msg.sender, canClaimAmount);
@@ -97,10 +103,9 @@ contract MyIDO is Ownable(msg.sender){
      */
     function withdraw() public OnlySuccess() {
         // 项目方只能提取一定比例的募集金额
-        uint256 preSaleRaised = address(this).balance;
-        uint256 projectCanWithdraw = preSaleRaised * projectCanWithdrawRate / 100;
+        uint256 projectCanWithdraw = totalReceivedETH * projectCanWithdrawRate / 100;
         payable(owner()).transfer(projectCanWithdraw);
-        preSaleRaised -= projectCanWithdraw;
+        totalReceivedETH -= projectCanWithdraw;
         emit Withdraw(msg.sender, projectCanWithdraw);
     }
 
@@ -112,4 +117,12 @@ contract MyIDO is Ownable(msg.sender){
     event Refund(address indexed refunder, uint256 amount);
     event Claim(address indexed claimer, uint256 amount);
     event Withdraw(address indexed withdrawer, uint256 amount);
+}
+
+contract MockIDO is MyIDO {
+    constructor(address _token) MyIDO(_token) {}
+
+    function setTestTotalReceivedETH(uint256 amount) public payable {
+        totalReceivedETH = amount;
+    }
 }

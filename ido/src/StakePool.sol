@@ -42,7 +42,7 @@ contract StakePool {
         StakedInfo memory stakeDetails = stakedInfos[msg.sender];
         if (stakeDetails.stakedAmount > 0) {
             // calculate reward and add to unClaimedReward
-            uint256 reward = calculateReward(stakeDetails);
+            uint256 reward = _calculateReward(stakeDetails);
             stakedInfos[msg.sender].unClaimedReward += reward;
         }
         stakedInfos[msg.sender].stakedAmount += amount;
@@ -52,11 +52,26 @@ contract StakePool {
         IERC20(RNTToken).transferFrom(msg.sender, address(this), amount);
     }
 
-    function calculateReward(StakedInfo memory stakeDetails) internal view returns (uint256) {
+    function _calculateReward(StakedInfo memory stakeDetails) internal view returns (uint256) {
         // calculate reward based on staked amount and time
         uint256 timeElapsed = block.timestamp - stakeDetails.lastStakedAt;
         uint256 canGetRewardRate = rewardRate * timeElapsed / rewardDuration;
+        stakeDetails.unClaimedReward += stakeDetails.stakedAmount * canGetRewardRate;
         return stakeDetails.stakedAmount * canGetRewardRate;
+    }
+     function _updateReward(address user) private{
+        StakedInfo storage stakeDetails = stakedInfos[user];
+        if (stakeDetails.lastStakedAt == 0) {
+            // if there is no staked amount, return
+            stakedInfos[user].lastStakedAt = block.timestamp;
+            return ;
+        }
+        // calculate reward based on staked amount and time
+        uint256 timeElapsed = block.timestamp - stakeDetails.lastStakedAt;
+        // 1 * timeElapsed(s) / 1 days
+        uint256 canGetRewardRate = rewardRate * timeElapsed / rewardDuration;  
+        stakeDetails.unClaimedReward += stakeDetails.stakedAmount * canGetRewardRate;
+        stakeDetails.lastStakedAt = block.timestamp;
     }
 
     function unstake(uint256 amount) external {
@@ -64,7 +79,7 @@ contract StakePool {
         StakedInfo memory stakeDetails = stakedInfos[msg.sender];
         require(stakeDetails.stakedAmount >= amount, "insufficient balance");
         // calculate reward and decrease staked amount
-        stakedInfos[msg.sender].unClaimedReward += calculateReward(stakeDetails);
+        stakedInfos[msg.sender].unClaimedReward += _calculateReward(stakeDetails);
         stakedInfos[msg.sender].stakedAmount -= amount;
         stakedInfos[msg.sender].lastStakedAt = block.timestamp;
         // transfer tokens to user
@@ -74,6 +89,8 @@ contract StakePool {
      function claimReward() external {
         StakedInfo memory stakeDetails = stakedInfos[msg.sender];
         require(stakeDetails.unClaimedReward > 0, "no reward to claim");
+        // calculate reward and add to unClaimedReward
+        uint256 reward = stakeDetails.unClaimedReward + _calculateReward(stakeDetails);
         stakedInfos[msg.sender].unClaimedReward = 0;
         stakedInfos[msg.sender].lastStakedAt = block.timestamp;
 
@@ -81,7 +98,7 @@ contract StakePool {
         // TODO: permit and use the call
         (bool result,) = esRNTToken.call(
                         abi.encodeWithSignature("mintAndLock(address,uint256)",
-                        msg.sender, stakeDetails.unClaimedReward
+                        msg.sender, reward
                     ));
         require(result, "mintAndLock failed");
     

@@ -4,12 +4,12 @@ pragma solidity ^0.8.20;
 
 import {console, StdCheats, Test} from "forge-std/Test.sol";
 import {RNTToken} from "../src/RNTToken.sol";
-import {MyIDO} from "../src/MyIDO.sol";
+import {MyIDO, MockIDO} from "../src/MyIDO.sol";
 
 contract IDOTest is Test {
 
     RNTToken idoToken;
-    MyIDO ido;
+    MockIDO ido;
     
 
     address idoOwner = makeAddr("idoOwner");
@@ -22,7 +22,7 @@ contract IDOTest is Test {
         
         vm.startPrank(idoOwner);
         idoToken = new RNTToken();
-        ido = new MyIDO(address(idoToken));
+        ido = new MockIDO(address(idoToken));
         idoToken.mint(address(ido), idoToken.totalSupply());
         vm.stopPrank();
     }
@@ -37,7 +37,8 @@ contract IDOTest is Test {
         assertEq(ido.getPreSaleAmount(), initUserEther);
         
         // 测试预售成功， 用户领取奖励
-        vm.deal(address(ido), ido.preSaleTarget());
+        vm.deal(alice, ido.preSaleTarget());
+        ido.setTestTotalReceivedETH{value: ido.preSaleTarget()}(ido.preSaleTarget());
         vm.warp(ido.preSaleEndTime() + 1 hours);
         ido.claim();
         // 用户得到的奖励代币数额是否正确
@@ -90,11 +91,15 @@ contract IDOTest is Test {
     // 测试预售募集金额已达上限，预售结束
     function testPreSaleOverCap() public {
         console.log(unicode">>>>> =========================== 测试预售募集金额已达上限，预售结束 ===========================<<<<<<");
-        address user = makeAddr("testPreSaleOverCap");
+        
         vm.warp(ido.preSaleStartTime() + 1 hours);
-        vm.deal(address(ido), ido.preSaleCap() + 1 ether);
-        vm.deal(user, initUserEther);
+        vm.deal(alice, ido.preSaleCap());
+        vm.prank(alice);
+        ido.setTestTotalReceivedETH{value: ido.preSaleCap()}(ido.preSaleCap());
+
+        address user = makeAddr("testPreSaleOverCap");
         vm.startPrank(user);
+        vm.deal(user, initUserEther);
         vm.expectRevert("PreSale is full");
         ido.preSale{value: user.balance}();
         vm.stopPrank();
