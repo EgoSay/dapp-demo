@@ -10,3 +10,6 @@
 [submodule "ido/lib/openzeppelin-contracts"]
 	path = ido/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "contract-upgrade/lib/forge-std"]
+	path = contract-upgrade/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
