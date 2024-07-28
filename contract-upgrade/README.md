@@ -1,66 +1,15 @@
-## Foundry
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+# 合约升级
 
-Foundry consists of:
+## 底层调用（Call /DelegateCall）
+> - **Call**：调用目标合约的函数，并在目标合约的上下文中执行，但调用者合约的存储状态不会改变
+> - **DelegateCall**：调用目标合约的函数，并在调用者合约的上下文中执行，调用者合约的存储状态会改变
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### 底层概念
+- EVM 不关心状态变量，而是**在存储槽上操作**，所有的变量状态变化，都是对应于存储slot 上的内容变更， 所以需要**注意 slot 冲突, 也就是当前合约和目标合约的 slot 槽位布局不能冲突**
+- **一个合约对目标智能合约进行 delegatecall 时，会在自己的环境中执行目标合约的逻辑**  (相当于把目标合约的代码复制到当前合约中执行)
 
-## Documentation
+参考链接：
+[# Delegatecall: 详细且生动的指南](https://learnblockchain.cn/article/8827)
 
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+## 合约升级
