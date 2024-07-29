@@ -100,8 +100,9 @@ contract TokenFactoryTest is Test {
     
         // Give some ETH
         // vm.startPrank(address(proxy));
-        vm.deal(alice, 2 ether); 
-        factoryV2.mintInscription{value: 2 ether}(tokenV2);
+        uint256 payedFees = perMint * 2 * 1 ether;
+        vm.deal(alice, payedFees); 
+        factoryV2.mintInscription{value: payedFees}(tokenV2);
         assertEq(MyERC20(tokenV2).balanceOf(alice), perMint * 2);
         vm.stopPrank();
     }

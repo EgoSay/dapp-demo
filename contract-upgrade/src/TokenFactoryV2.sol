@@ -42,7 +42,7 @@ contract TokenFactoryV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     function mintInscription(address tokenAddr) public payable {
         require(tokenCreator[tokenAddr] == msg.sender, "Not the token creator");
         // need fees to mint
-        require(msg.value >= tokenPrice[tokenAddr], "Insufficient payment");
+        require(msg.value >= tokenPrice[tokenAddr] * MyERC20(tokenAddr).perMint(), "Insufficient payment");
         MyERC20(tokenAddr).mint(msg.sender);
         emit MyTokenMinted(tokenAddr, msg.sender);
     }
