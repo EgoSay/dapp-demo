@@ -15,9 +15,9 @@ contract TokenFactoryV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => uint256) public tokenPrice;
     address public implementationContract;
 
-    // constructor() {
-    //     _disableInitializers();
-    // }
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize() public initializer {
         __Ownable_init(msg.sender);

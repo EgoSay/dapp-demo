@@ -43,6 +43,8 @@ contract TokenFactoryTest is Test {
 
     function testDeployAndMintV1() public {
         vm.startPrank(alice);
+        bytes memory initData = abi.encodeWithSelector(TokenFactoryV1.initialize.selector);
+        proxy = new ERC1967Proxy(address(factoryV1Implementation), initData);
         TokenFactoryV1 factory = TokenFactoryV1(address(proxy));
         address tokenAddr = factory.deployInscription(symbol, totalSupply, perMint);
         assertEq(factory.tokenCreator(tokenAddr), alice);
@@ -83,6 +85,7 @@ contract TokenFactoryTest is Test {
 
         // Verify state preservation, the token owner need be bob
         assertEq(factoryV2.tokenCreator(tokenV1), bob);
+        // assertEq(MyERC20(tokenV1).owner(), bob);
         assertEq(factoryV2.tokenCreator(tokenV2), alice);
         assertEq(MyERC20(tokenV1).totalSupplyLimit(), totalSupply);
         assertEq(MyERC20(tokenV2).totalSupplyLimit(), totalSupply * 2);

@@ -1,0 +1,210 @@
+No files changed, compilation skipped
+
+Ran 2 tests for test/TokenFactoryTest.sol:TokenFactoryTest
+[PASS] testDeployAndMintV1() (gas: 943610)
+Logs:
+  0x7c8999dC9a822c1f0Df42023113EDB4FDd543266 0x328809Bc894f92807417D2dAD6b7C998c1aFdac6 0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e
+  Token created with address:  0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336
+  Token creator:  0x328809Bc894f92807417D2dAD6b7C998c1aFdac6
+
+Traces:
+  [943610] TokenFactoryTest::testDeployAndMintV1()
+    ├─ [0] VM::startPrank(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   └─ ← [Return] 
+    ├─ [110041] → new ERC1967Proxy@0xC8501479803c58592eF3Be0beABBEE22e3377C08
+    │   ├─ emit Upgraded(implementation: TokenFactoryV1: [0x88F59F8826af5e695B13cA934d6c7999875A9EeA])
+    │   ├─ [48521] TokenFactoryV1::initialize() [delegatecall]
+    │   │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   │   ├─ emit Initialized(version: 1)
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Return] 170 bytes of code
+    ├─ [684071] ERC1967Proxy::deployInscription("TEST", 1000000000000000000000000 [1e24], 1000000000000000000000 [1e21])
+    │   ├─ [683657] TokenFactoryV1::deployInscription("TEST", 1000000000000000000000000 [1e24], 1000000000000000000000 [1e21]) [delegatecall]
+    │   │   ├─ [623529] → new MyERC20@0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336
+    │   │   │   └─ ← [Return] 2555 bytes of code
+    │   │   ├─ [0] console::log("Token created with address: ", MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [staticcall]
+    │   │   │   └─ ← [Stop] 
+    │   │   ├─ [0] console::log("Token creator: ", alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   │   │   └─ ← [Stop] 
+    │   │   └─ ← [Return] MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]
+    │   └─ ← [Return] MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]
+    ├─ [944] ERC1967Proxy::tokenCreator(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [staticcall]
+    │   ├─ [551] TokenFactoryV1::tokenCreator(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [delegatecall]
+    │   │   └─ ← [Return] alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]
+    │   └─ ← [Return] alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]
+    ├─ [0] VM::assertEq(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [1244] MyERC20::symbol() [staticcall]
+    │   └─ ← [Return] "TEST"
+    ├─ [0] VM::assertEq("TEST", "TEST") [staticcall]
+    │   └─ ← [Return] 
+    ├─ [339] MyERC20::totalSupplyLimit() [staticcall]
+    │   └─ ← [Return] 1000000000000000000000000 [1e24]
+    ├─ [0] VM::assertEq(1000000000000000000000000 [1e24], 1000000000000000000000000 [1e24]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [71123] ERC1967Proxy::mintInscription(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336])
+    │   ├─ [70733] TokenFactoryV1::mintInscription(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [delegatecall]
+    │   │   ├─ [69799] MyERC20::mint(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   │   │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], value: 1000000000000000000000 [1e21])
+    │   │   │   └─ ← [Stop] 
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Return] 
+    ├─ [563] MyERC20::balanceOf(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   └─ ← [Return] 1000000000000000000000 [1e21]
+    ├─ [0] VM::assertEq(1000000000000000000000 [1e21], 1000000000000000000000 [1e21]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testUpgradeAndStatePreservation() (gas: 1158895)
+Logs:
+  0x7c8999dC9a822c1f0Df42023113EDB4FDd543266 0x328809Bc894f92807417D2dAD6b7C998c1aFdac6 0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e
+  fcatory v1 owner:  0x328809Bc894f92807417D2dAD6b7C998c1aFdac6
+  Token created with address:  0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336
+  Token creator:  0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e
+
+Traces:
+  [1158895] TokenFactoryTest::testUpgradeAndStatePreservation()
+    ├─ [0] VM::startPrank(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   └─ ← [Return] 
+    ├─ [110041] → new ERC1967Proxy@0xC8501479803c58592eF3Be0beABBEE22e3377C08
+    │   ├─ emit Upgraded(implementation: TokenFactoryV1: [0x88F59F8826af5e695B13cA934d6c7999875A9EeA])
+    │   ├─ [48521] TokenFactoryV1::initialize() [delegatecall]
+    │   │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   │   ├─ emit Initialized(version: 1)
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Return] 170 bytes of code
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e])
+    │   └─ ← [Return] 
+    ├─ [710] ERC1967Proxy::owner() [staticcall]
+    │   ├─ [320] TokenFactoryV1::owner() [delegatecall]
+    │   │   └─ ← [Return] alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]
+    │   └─ ← [Return] alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]
+    ├─ [0] console::log("fcatory v1 owner: ", alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [681571] ERC1967Proxy::deployInscription("TEST", 1000000000000000000000000 [1e24], 1000000000000000000000 [1e21])
+    │   ├─ [681157] TokenFactoryV1::deployInscription("TEST", 1000000000000000000000000 [1e24], 1000000000000000000000 [1e21]) [delegatecall]
+    │   │   ├─ [623529] → new MyERC20@0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336
+    │   │   │   └─ ← [Return] 2555 bytes of code
+    │   │   ├─ [0] console::log("Token created with address: ", MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [staticcall]
+    │   │   │   └─ ← [Stop] 
+    │   │   ├─ [0] console::log("Token creator: ", bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e]) [staticcall]
+    │   │   │   └─ ← [Stop] 
+    │   │   └─ ← [Return] MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]
+    │   └─ ← [Return] MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   └─ ← [Return] 
+    ├─ [6648] ERC1967Proxy::upgradeToAndCall(TokenFactoryV2: [0xCeF98e10D1e80378A9A74Ce074132B66CDD5e88d], 0x)
+    │   ├─ [6249] TokenFactoryV1::upgradeToAndCall(TokenFactoryV2: [0xCeF98e10D1e80378A9A74Ce074132B66CDD5e88d], 0x) [delegatecall]
+    │   │   ├─ [354] TokenFactoryV2::proxiableUUID() [staticcall]
+    │   │   │   └─ ← [Return] 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+    │   │   ├─ emit Upgraded(implementation: TokenFactoryV2: [0xCeF98e10D1e80378A9A74Ce074132B66CDD5e88d])
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Return] 
+    ├─ [24275] ERC1967Proxy::setImplementation(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336])
+    │   ├─ [23885] TokenFactoryV2::setImplementation(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [delegatecall]
+    │   │   ├─ emit MyTokenImplSet(impl: MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336])
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Return] 
+    ├─ [156487] ERC1967Proxy::deployInscription("TEST", 2000000000000000000000000 [2e24], 2000000000000000000000 [2e21], 1000000000000000000 [1e18])
+    │   ├─ [156067] TokenFactoryV2::deployInscription("TEST", 2000000000000000000000000 [2e24], 2000000000000000000000 [2e21], 1000000000000000000 [1e18]) [delegatecall]
+    │   │   ├─ [9031] → new <unknown>@0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba
+    │   │   │   └─ ← [Return] 45 bytes of code
+    │   │   ├─ [67213] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::initialize("TEST", 2000000000000000000000000 [2e24], 2000000000000000000000 [2e21])
+    │   │   │   ├─ [67020] MyERC20::initialize("TEST", 2000000000000000000000000 [2e24], 2000000000000000000000 [2e21]) [delegatecall]
+    │   │   │   │   └─ ← [Stop] 
+    │   │   │   └─ ← [Return] 
+    │   │   ├─ emit MyTokenCreatorUpdated(tokenAddr: 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba, creator: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   │   └─ ← [Return] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba
+    │   └─ ← [Return] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba
+    ├─ [967] ERC1967Proxy::tokenCreator(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [staticcall]
+    │   ├─ [574] TokenFactoryV2::tokenCreator(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [delegatecall]
+    │   │   └─ ← [Return] bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e]
+    │   └─ ← [Return] bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e]
+    ├─ [0] VM::assertEq(bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e], bob: [0x1D96F2f6BeF1202E4Ce1Ff6Dad0c2CB002861d3e]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [967] ERC1967Proxy::tokenCreator(0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba) [staticcall]
+    │   ├─ [574] TokenFactoryV2::tokenCreator(0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba) [delegatecall]
+    │   │   └─ ← [Return] alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]
+    │   └─ ← [Return] alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]
+    ├─ [0] VM::assertEq(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [339] MyERC20::totalSupplyLimit() [staticcall]
+    │   └─ ← [Return] 1000000000000000000000000 [1e24]
+    ├─ [0] VM::assertEq(1000000000000000000000000 [1e24], 1000000000000000000000000 [1e24]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [505] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::totalSupplyLimit() [staticcall]
+    │   ├─ [339] MyERC20::totalSupplyLimit() [delegatecall]
+    │   │   └─ ← [Return] 2000000000000000000000000 [2e24]
+    │   └─ ← [Return] 2000000000000000000000000 [2e24]
+    ├─ [0] VM::assertEq(2000000000000000000000000 [2e24], 2000000000000000000000000 [2e24]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [363] MyERC20::perMint() [staticcall]
+    │   └─ ← [Return] 1000000000000000000000 [1e21]
+    ├─ [0] VM::assertEq(1000000000000000000000 [1e21], 1000000000000000000000 [1e21]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [529] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::perMint() [staticcall]
+    │   ├─ [363] MyERC20::perMint() [delegatecall]
+    │   │   └─ ← [Return] 2000000000000000000000 [2e21]
+    │   └─ ← [Return] 2000000000000000000000 [2e21]
+    ├─ [0] VM::assertEq(2000000000000000000000 [2e21], 2000000000000000000000 [2e21]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(Not the token creator)
+    │   └─ ← [Return] 
+    ├─ [1059] ERC1967Proxy::mintInscription(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336])
+    │   ├─ [653] TokenFactoryV2::mintInscription(MyERC20: [0xa9FD21a21BDFF214Ce9DCcC2a9e15269e08cA336]) [delegatecall]
+    │   │   └─ ← [Revert] revert: Not the token creator
+    │   └─ ← [Revert] revert: Not the token creator
+    ├─ [0] VM::expectRevert(Insufficient payment)
+    │   └─ ← [Return] 
+    ├─ [2238] ERC1967Proxy::mintInscription(0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba)
+    │   ├─ [1832] TokenFactoryV2::mintInscription(0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba) [delegatecall]
+    │   │   ├─ [529] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::perMint() [staticcall]
+    │   │   │   ├─ [363] MyERC20::perMint() [delegatecall]
+    │   │   │   │   └─ ← [Return] 2000000000000000000000 [2e21]
+    │   │   │   └─ ← [Return] 2000000000000000000000 [2e21]
+    │   │   └─ ← [Revert] revert: Insufficient payment
+    │   └─ ← [Revert] revert: Insufficient payment
+    ├─ [0] VM::deal(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], 2000000000000000000000000000000000000000 [2e39])
+    │   └─ ← [Return] 
+    ├─ [73994] ERC1967Proxy::mintInscription{value: 2000000000000000000000000000000000000000}(0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba)
+    │   ├─ [73604] TokenFactoryV2::mintInscription{value: 2000000000000000000000000000000000000000}(0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba) [delegatecall]
+    │   │   ├─ [529] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::perMint() [staticcall]
+    │   │   │   ├─ [363] MyERC20::perMint() [delegatecall]
+    │   │   │   │   └─ ← [Return] 2000000000000000000000 [2e21]
+    │   │   │   └─ ← [Return] 2000000000000000000000 [2e21]
+    │   │   ├─ [69968] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::mint(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   │   │   ├─ [69799] MyERC20::mint(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [delegatecall]
+    │   │   │   │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6], value: 2000000000000000000000 [2e21])
+    │   │   │   │   └─ ← [Stop] 
+    │   │   │   └─ ← [Return] 
+    │   │   ├─ emit MyTokenMinted(tokenAddr: 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba, to: alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6])
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Return] 
+    ├─ [735] 0xb572Fdcdf4671571e0f115f975c262e8b2Ba96Ba::balanceOf(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [staticcall]
+    │   ├─ [563] MyERC20::balanceOf(alice: [0x328809Bc894f92807417D2dAD6b7C998c1aFdac6]) [delegatecall]
+    │   │   └─ ← [Return] 2000000000000000000000 [2e21]
+    │   └─ ← [Return] 2000000000000000000000 [2e21]
+    ├─ [0] VM::assertEq(2000000000000000000000 [2e21], 2000000000000000000000 [2e21]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 2.60ms (1.05ms CPU time)
+
+Ran 1 test suite in 2.35s (2.60ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
+
+
+Test Summary:
+
+╭------------------+--------+--------+---------+---------------------------+----------╮
+|    Test Suite    | Passed | Failed | Skipped |         File Path         | Duration |
++=====================================================================================+
+| TokenFactoryTest |    2   |    0   |    0    | test/TokenFactoryTest.sol | 2.60ms   |
+╰------------------+--------+--------+---------+---------------------------+----------╯

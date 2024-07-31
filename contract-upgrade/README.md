@@ -1,15 +1,49 @@
-
 # 合约升级
 
-## 底层调用（Call /DelegateCall）
-> - **Call**：调用目标合约的函数，并在目标合约的上下文中执行，但调用者合约的存储状态不会改变
-> - **DelegateCall**：调用目标合约的函数，并在调用者合约的上下文中执行，调用者合约的存储状态会改变
+## Task1
+实现⼀个可升级的工厂合约，工厂合约有两个方法：
 
-### 底层概念
-- EVM 不关心状态变量，而是**在存储槽上操作**，所有的变量状态变化，都是对应于存储slot 上的内容变更， 所以需要**注意 slot 冲突, 也就是当前合约和目标合约的 slot 槽位布局不能冲突**
-- **一个合约对目标智能合约进行 delegatecall 时，会在自己的环境中执行目标合约的逻辑**  (相当于把目标合约的代码复制到当前合约中执行)
+- `deployInscription(string symbol, uint totalSupply, uint perMint)` ，该方法用来创建 ERC20 token，（模拟铭文的 deploy）， symbol 表示 Token 的名称，totalSupply 表示可发行的数量，perMint 用来控制每次发行的数量，用于控制mintInscription函数每次发行的数量
 
-参考链接：
-[# Delegatecall: 详细且生动的指南](https://learnblockchain.cn/article/8827)
+- `mintInscription(address tokenAddr)` 用来发行 ERC20 token，每次调用一次，发行perMint指定的数量。
 
-## 合约升级
+要求：
+
+- 合约的第⼀版本用普通的 new 的方式发行 ERC20 token 。
+
+- 第⼆版本，deployInscription 加入一个价格参数 price  deployInscription(string symbol, uint totalSupply, uint perMint, uint price) , price 表示发行每个 token 需要支付的费用，并且 第⼆版本使用最小代理的方式以更节约 gas 的方式来创建 ERC20 token，需要同时修改 mintInscription 的实现以便收取每次发行的费用
+
+### 实现代码:
+- [TokenFactoryV1.sol](./src/TokenFactoryV1.sol)
+- [TokenFactoryV2.sol](./src/TokenFactoryV2.sol)
+
+### 测试用例
+- [TokenFactoryTest.sol](./test/TokenFactoryTest.sol)
+
+测试日志:
+- [TokenFactoryTest.log](./test/TokenFactoryTest.log)
+
+### 合约部署信息
+  - 代理合约: https://sepolia.etherscan.io/address/0xfde330598359e46b758b0b42a634d8e697411b1e#code
+  
+  - TokenFactoryV1: https://sepolia.etherscan.io/address/0x066607AA549AF9E57625C2710cE72267C4A26044
+  
+  - TokenFactoryV2: https://sepolia.etherscan.io/address/0x4D43da276171AB682c50D4DeDDF7189a27a4E13F
+
+  ```
+  deployer: 0x8e9df9e6031C95Cac5974633D7aFdFc922027aa6
+
+  ERC20 Implementation deployed at: 0x3e2982f7344622847eB96a3CF478C2e8F8D6DED5
+
+  Factory V1 Implementation deployed at: 0x066607AA549AF9E57625C2710cE72267C4A26044
+
+  Factory Proxy (UUPS) deployed at: 0xfDE330598359E46b758B0B42A634d8e697411B1E
+
+  New ERC20 token deployed at: 0xb80cEb8c75c839290027D6e0CedA55188E2B3555
+
+  Factory V2 Implementation deployed at: 0x4D43da276171AB682c50D4DeDDF7189a27a4E13F
+  
+  New ERC20 token (V2) deployed at: 0x7c9e30b50A6d9C52662319B86F0cE50BC8f34634
+  ```
+
+
