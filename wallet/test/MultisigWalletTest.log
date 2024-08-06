@@ -1,0 +1,176 @@
+No files changed, compilation skipped
+
+Ran 4 tests for test/MultisigWalletTest.sol:MultisigWalletTest
+[PASS] testAddAndRemoveOwner() (gas: 49595)
+Traces:
+  [49595] MultisigWalletTest::testAddAndRemoveOwner()
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] newOwner: [0x7240b687730BE024bcfD084621f794C2e4F8408f]
+    ├─ [0] VM::label(newOwner: [0x7240b687730BE024bcfD084621f794C2e4F8408f], "newOwner")
+    │   └─ ← [Return] 
+    ├─ [0] VM::startPrank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectEmit(true, false, false, false)
+    │   └─ ← [Return] 
+    ├─ emit OwnerAdded(owner: newOwner: [0x7240b687730BE024bcfD084621f794C2e4F8408f])
+    ├─ [26170] MultisigWallet::addOwner(newOwner: [0x7240b687730BE024bcfD084621f794C2e4F8408f])
+    │   ├─ emit OwnerAdded(owner: newOwner: [0x7240b687730BE024bcfD084621f794C2e4F8408f])
+    │   └─ ← [Stop] 
+    ├─ [524] MultisigWallet::ownerRoles(newOwner: [0x7240b687730BE024bcfD084621f794C2e4F8408f]) [staticcall]
+    │   └─ ← [Return] true
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectEmit(true, false, false, false)
+    │   └─ ← [Return] 
+    ├─ emit OwnerRemoved(owner: SHA-256: [0x0000000000000000000000000000000000000002])
+    ├─ [7017] MultisigWallet::removeOwner(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ emit OwnerRemoved(owner: SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Stop] 
+    ├─ [524] MultisigWallet::ownerRoles(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] false
+    ├─ [0] VM::assertFalse(false) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testExecuteTransaction(uint256) (runs: 256, μ: 236077, ~: 236077)
+Traces:
+  [236077] MultisigWalletTest::testExecuteTransaction(2220144525724863113 [2.22e18])
+    ├─ [0] VM::assume(true) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] 0x54a948B3D76Ce84e5c7B4B3cD01F2aF1f18D41e0
+    ├─ [0] VM::label(0x54a948B3D76Ce84e5c7B4B3cD01F2aF1f18D41e0, "test2")
+    │   └─ ← [Return] 
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return] 
+    ├─ [77998] MultisigWallet::submitTransaction(0x54a948B3D76Ce84e5c7B4B3cD01F2aF1f18D41e0, 2220144525724863113 [2.22e18], 0x)
+    │   ├─ emit Submission(transactionId: 0)
+    │   └─ ← [Return] 0
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return] 
+    ├─ [47200] MultisigWallet::confirmTransaction(0)
+    │   ├─ emit Confirmation(sender: SHA-256: [0x0000000000000000000000000000000000000002], transactionId: 0)
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Return] 
+    ├─ [27300] MultisigWallet::confirmTransaction(0)
+    │   ├─ emit Confirmation(sender: RIPEMD-160: [0x0000000000000000000000000000000000000003], transactionId: 0)
+    │   └─ ← [Stop] 
+    ├─ [0] VM::deal(MultisigWallet: [0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f], 4440289051449726226 [4.44e18])
+    │   └─ ← [Return] 
+    ├─ [59443] MultisigWallet::executeTransaction(0)
+    │   ├─ [0] 0x54a948B3D76Ce84e5c7B4B3cD01F2aF1f18D41e0::fallback{value: 2220144525724863113}()
+    │   │   └─ ← [Stop] 
+    │   ├─ emit Execution(transactionId: 0)
+    │   └─ ← [Stop] 
+    ├─ [0] VM::assertEq(2220144525724863113 [2.22e18], 2220144525724863113 [2.22e18]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::assertEq(2220144525724863113 [2.22e18], 2220144525724863113 [2.22e18]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [1770] MultisigWallet::transactions(0) [staticcall]
+    │   └─ ← [Return] 0x54a948B3D76Ce84e5c7B4B3cD01F2aF1f18D41e0, 2220144525724863113 [2.22e18], 0x, true, 2
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] testRevertTransaction() (gas: 154057)
+Traces:
+  [154057] MultisigWalletTest::testRevertTransaction()
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] test3: [0x0983fEa8D108240F41f47077cA1167B8A798EbDe]
+    ├─ [0] VM::label(test3: [0x0983fEa8D108240F41f47077cA1167B8A798EbDe], "test3")
+    │   └─ ← [Return] 
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(Not an owner)
+    │   └─ ← [Return] 
+    ├─ [3027] MultisigWallet::submitTransaction(test3: [0x0983fEa8D108240F41f47077cA1167B8A798EbDe], 1000000000000000000 [1e18], 0x)
+    │   └─ ← [Revert] revert: Not an owner
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return] 
+    ├─ [77998] MultisigWallet::submitTransaction(test3: [0x0983fEa8D108240F41f47077cA1167B8A798EbDe], 1000000000000000000 [1e18], 0x)
+    │   ├─ emit Submission(transactionId: 0)
+    │   └─ ← [Return] 0
+    ├─ [0] VM::startPrank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return] 
+    ├─ [47200] MultisigWallet::confirmTransaction(0)
+    │   ├─ emit Confirmation(sender: SHA-256: [0x0000000000000000000000000000000000000002], transactionId: 0)
+    │   └─ ← [Stop] 
+    ├─ [0] VM::expectRevert(Transaction already confirmed)
+    │   └─ ← [Return] 
+    ├─ [1224] MultisigWallet::confirmTransaction(0)
+    │   └─ ← [Revert] revert: Transaction already confirmed
+    ├─ [0] VM::stopPrank()
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(Not enough confirmations)
+    │   └─ ← [Return] 
+    ├─ [3131] MultisigWallet::executeTransaction(0)
+    │   └─ ← [Revert] revert: Not enough confirmations
+    └─ ← [Stop] 
+
+[PASS] testSubmitAndConfirmTransaction() (gas: 184157)
+Traces:
+  [184157] MultisigWalletTest::testSubmitAndConfirmTransaction()
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] test: [0xC08B5542D177ac6686946920409741463a15dDdB]
+    ├─ [0] VM::label(test: [0xC08B5542D177ac6686946920409741463a15dDdB], "test")
+    │   └─ ← [Return] 
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return] 
+    ├─ [77998] MultisigWallet::submitTransaction(test: [0xC08B5542D177ac6686946920409741463a15dDdB], 1000000000000000000 [1e18], 0x)
+    │   ├─ emit Submission(transactionId: 0)
+    │   └─ ← [Return] 0
+    ├─ [295] MultisigWallet::transactionCount() [staticcall]
+    │   └─ ← [Return] 1
+    ├─ [0] VM::assertEq(1, 1) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [1770] MultisigWallet::transactions(0) [staticcall]
+    │   └─ ← [Return] test: [0xC08B5542D177ac6686946920409741463a15dDdB], 1000000000000000000 [1e18], 0x, false, 0
+    ├─ [0] VM::assertEq(test: [0xC08B5542D177ac6686946920409741463a15dDdB], test: [0xC08B5542D177ac6686946920409741463a15dDdB]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::assertEq(0x, 0x) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::assertFalse(false) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return] 
+    ├─ [47200] MultisigWallet::confirmTransaction(0)
+    │   ├─ emit Confirmation(sender: SHA-256: [0x0000000000000000000000000000000000000002], transactionId: 0)
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Return] 
+    ├─ [27300] MultisigWallet::confirmTransaction(0)
+    │   ├─ emit Confirmation(sender: RIPEMD-160: [0x0000000000000000000000000000000000000003], transactionId: 0)
+    │   └─ ← [Stop] 
+    ├─ [1770] MultisigWallet::transactions(0) [staticcall]
+    │   └─ ← [Return] test: [0xC08B5542D177ac6686946920409741463a15dDdB], 1000000000000000000 [1e18], 0x, false, 2
+    ├─ [0] VM::assertEq(2, 2) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [663] MultisigWallet::confirmations(0, SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] true
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return] 
+    ├─ [663] MultisigWallet::confirmations(0, RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   └─ ← [Return] true
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 590.82ms (591.25ms CPU time)
+
+Ran 1 test suite in 698.09ms (590.82ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+
+
+Test Summary:
+
+╭--------------------+--------+--------+---------+-----------------------------+----------╮
+|     Test Suite     | Passed | Failed | Skipped |          File Path          | Duration |
++=========================================================================================+
+| MultisigWalletTest |    4   |    0   |    0    | test/MultisigWalletTest.sol | 590.82ms |
+╰--------------------+--------+--------+---------+-----------------------------+----------╯
