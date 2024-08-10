@@ -34,10 +34,10 @@
 - `claimNFT()` : 通过默克尔树验证白名单，并利用 permitPrePay 的授权，转入 token 转出 NFT 
 
 ### 实现代码
-[PermitAirdopMerkleNFTMarket](./src/PermitAirdopMerkleNFTMarket.sol)
+[PermitAirdopMerkleNFTMarket](./src/AirdopMerkleNFTMarket.sol)
 
 ### 测试用例
-[PermitAirdopMerkleNFTMarketTest](./test/PermitAirdopMerkleNFTMarketTest.sol)
+[PermitAirdopMerkleNFTMarketTest](./test/AirdopMerkleNFTMarket.t.sol)
 
 ### 测试结果
-[testPermitAirdopMerkleNFTMarket.log](./test/testPermitAirdopMerkleNFTMarket.log)
+[testPermitAirdopMerkleNFTMarket.log](./test/AirdopMerkleNFTMarketTest.log)
