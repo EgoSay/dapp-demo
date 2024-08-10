@@ -33,14 +33,14 @@ contract AirdopMerkleNFTMarket is PermitNFTMarket {
         // find the nft order id
         bytes32 orderId = listing(nftAddress, tokenId);
         require(orderId != bytes32(0), "PermitNFTMarket: order not listed");
-        buyWithDiscount(orderId, merkleProof, 50);
+        buyWithDiscount(orderId, merkleProof, DISCOUNT_RATE);
         emit ClaimNFT(nftAddress, tokenId);
     }
 
     // buy with discount
     function buyWithDiscount(bytes32 orderId, bytes32[] calldata merkleProof, uint256 discountRate) public payable {
         require(_verify(merkleProof, msg.sender), "AirdopMerkleNFTMarket: invalid merkle proof");
-        _buy(orderId, feeTo, DISCOUNT_RATE);
+        _buy(orderId, feeTo, discountRate);
     }
 
     function multicall(bytes[] calldata datas) public returns (bytes[] memory results) {

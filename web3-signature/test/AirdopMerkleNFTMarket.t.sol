@@ -73,42 +73,6 @@ contract AirdopMerkleNFTMarketTest is Test {
         assertEq(token.balanceOf(seller), (sellPrice));
     }
 
-    function _prepareListNft(bytes memory signatureForNft) private {
-        // 上架 nft
-        vm.startPrank(seller);
-        bool listedRsult =  market.list(address(nftContract), nftOwnerMap[seller], address(token), nftDeafultPrice, deadline, signatureForNft);
-        assertTrue(listedRsult);
-        vm.stopPrank();
-    }
-
-    function getSignatureForNft() view private returns (bytes32){
-        uint256 tokenId = nftOwnerMap[seller];
-        bytes32 structHash = keccak256(abi.encode(
-                    nftContract.getPermitTypehash(),
-                    seller,
-                    address(market),
-                    address(nftContract),
-                    tokenId,
-                    deadline
-            ));
-        return nftContract.getHashData(structHash);
-    }
-
-    function getSignatureForTokenApprove () view private returns (bytes32){
-        uint256 nonce = token.nonces(buyer);
-        // 签名
-        return token.getHashData(
-                keccak256(abi.encode(
-                    token.getPermitTypehash(),
-                    buyer,
-                    address(market),
-                    nftDeafultPrice,
-                    nonce,
-                    deadline
-                ))
-            );
-    }
-
     function doPermitBuy(bytes memory tokenSignature) private {
         uint256 tokenId = nftOwnerMap[seller];
         deal(address(token), buyer, init_price);
@@ -144,5 +108,41 @@ contract AirdopMerkleNFTMarketTest is Test {
         }
 
         return getMerkleRoot(nextLevel);
+    }
+
+        function _prepareListNft(bytes memory signatureForNft) private {
+        // 上架 nft
+        vm.startPrank(seller);
+        bool listedRsult =  market.list(address(nftContract), nftOwnerMap[seller], address(token), nftDeafultPrice, deadline, signatureForNft);
+        assertTrue(listedRsult);
+        vm.stopPrank();
+    }
+
+    function getSignatureForNft() view private returns (bytes32){
+        uint256 tokenId = nftOwnerMap[seller];
+        bytes32 structHash = keccak256(abi.encode(
+                    nftContract.getPermitTypehash(),
+                    seller,
+                    address(market),
+                    address(nftContract),
+                    tokenId,
+                    deadline
+            ));
+        return nftContract.getHashData(structHash);
+    }
+
+    function getSignatureForTokenApprove () view private returns (bytes32){
+        uint256 nonce = token.nonces(buyer);
+        // 签名
+        return token.getHashData(
+                keccak256(abi.encode(
+                    token.getPermitTypehash(),
+                    buyer,
+                    address(market),
+                    nftDeafultPrice,
+                    nonce,
+                    deadline
+                ))
+            );
     }
 }
