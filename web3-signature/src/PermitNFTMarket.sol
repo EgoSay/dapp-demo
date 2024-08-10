@@ -95,7 +95,7 @@ contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) 
 
     // buy with eth and no fee
     function buy(bytes32 orderId) public payable {
-        _buy(orderId, feeTo);
+        _buy(orderId, feeTo, 100);
     }
 
     /*
@@ -104,7 +104,7 @@ contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) 
      * @param {address} feeReceiver 
      * @return {*}
      */    
-    function _buy(bytes32 orderId, address feeReceiver) private {
+    function _buy(bytes32 orderId, address feeReceiver, uint256 discountRate) internal {
         // 1. check the order is exist and valid
         NftOrderInfo memory order = nftOrders[orderId];
         require(order.seller != address(0), "PermitNFTMarket: order not listed");
@@ -112,6 +112,8 @@ contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) 
         
         // delete order info before transfer to avoid reentrancy
         delete nftOrders[orderId];
+        // if has discount rate, caculate the new price, default is 100%
+        order.price = order.price * discountRate / 100;
 
         // 2. transfer nft to the buyer
         IERC721(order.nftContract).safeTransferFrom(order.seller, msg.sender, order.tokenId);
@@ -160,7 +162,7 @@ contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) 
 
         _tokenPermit(nftOrder, signatureForApprove);
 
-        _buy(orderId, address(0));
+        _buy(orderId, address(0), 100);
         
         return true;
 
@@ -201,7 +203,7 @@ contract PermitNFTMarket is EIP712("PermitNFTMarket", "1"), Ownable(msg.sender) 
 
      function _tokenPermit(
         NftOrderInfo memory nftOrder,
-        bytes memory signatureForApprove) private {
+        bytes memory signatureForApprove) internal {
         // 执行 ERC20 的 permit 进行 授权
         (bytes32 r, bytes32 s, uint8 v) = decodeSign(signatureForApprove);
         IERC20Permit(nftOrder.payToken).permit(msg.sender, address(this), nftOrder.price, nftOrder.deadline, v, r, s);
