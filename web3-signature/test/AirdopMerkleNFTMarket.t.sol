@@ -28,17 +28,24 @@ contract AirdopMerkleNFTMarketTest is Test {
 
     // Mappingto track nft tokenId and it's owner
     mapping(address => uint256) nftOwnerMap;
-
+    address user1 = address(0x1111);
+    address user2 = address(0x2222);
 
     function setUp() public {
         nftContract = new PermitNFT();
         token = new PermitERC20Token();
 
-         // Create Merkle tree
-        bytes32[] memory leaves = new bytes32[](2);
-        leaves[0] = keccak256(abi.encodePacked(whitelistSigner));
-        leaves[1] = keccak256(abi.encodePacked(buyer));
-        bytes32 root = getMerkleRoot(leaves);
+        // Create Merkle tree
+        // hash0-0: 0x36d351db319e43161106cc568588e212d0003259607e5ba5c5e4fc502af5fe7b = hashPair(user1, user2)
+        // hash0-1: 0xfc263b9aeb45e8ea5a0808acc65dbf7a5a3854e5bd26d37d34b8c40485b42f02 = hashPair(whitelistSigner, buyer)
+        // hash root: 0x417701255d5c81b9b133d18de5c8376c66612d2d60ef45e372617dd847b22b37 = hashPair(hash0-0, hash0-1)
+        bytes32[] memory leaves = new bytes32[](4);
+        leaves[0] = keccak256(abi.encodePacked(user1));
+        leaves[1] = keccak256(abi.encodePacked(user2));
+        leaves[2] = keccak256(abi.encodePacked(whitelistSigner));
+        leaves[3] = keccak256(abi.encodePacked(buyer));
+
+        bytes32 root = getMerkleRoot(leaves); 
         market = new AirdopMerkleNFTMarket(root);
 
         // mint nft 给 seller 
@@ -85,8 +92,13 @@ contract AirdopMerkleNFTMarketTest is Test {
         multicallData[0] = abi.encodeWithSignature("permitPrePay(address,uint256,bytes)", address(nftContract), tokenId, tokenSignature);
 
         // Prepare Merkle proof
-        bytes32[] memory proof = new bytes32[](1);
+        bytes32[] memory proof = new bytes32[](2);
         proof[0] = keccak256(abi.encodePacked(whitelistSigner));
+        
+        bytes32[] memory leaves = new bytes32[](2);
+        leaves[0] = keccak256(abi.encodePacked(user1));
+        leaves[1] = keccak256(abi.encodePacked(user2));
+        proof[1] = getMerkleRoot(leaves);
         multicallData[1] = abi.encodeWithSignature("claimNFT(address,uint256,bytes32[])", address(nftContract), tokenId, proof);
         market.multicall(multicallData);
         vm.stopPrank();

@@ -115,14 +115,6 @@ contract StakePool {
         return (stakeDetails.stakedAmount, unclaimReward);
     }
 
-    struct PermitRequest {
-        uint256 nonce;
-        uint256 deadline;
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-    }
-
     event Stake(address indexed from, uint256 amount);
     event Unstake(address indexed from, uint256 amount);
     event Claim(address indexed from, uint256 amount);
